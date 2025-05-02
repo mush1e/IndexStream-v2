@@ -31,7 +31,7 @@ func Logger(next http.Handler) http.Handler {
 		start := time.Now()
 		rec := &recorder{ResponseWriter: w}
 		next.ServeHTTP(rec, r)
-		log.Printf("%s | %s | %d | %dB | %v",
+		log.Printf("%s | %s | %d | %dB | %v\n",
 			r.Method,
 			r.URL.RequestURI(),
 			rec.status,
