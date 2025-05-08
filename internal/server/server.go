@@ -16,8 +16,9 @@ func NewServer(cfg *config.Config) *http.Server {
 	addr := ":" + strconv.Itoa(cfg.Port)
 
 	mux.HandleFunc("/", handler.GetHome)
-	mux.HandleFunc("/search", handler.GetSearch)
-	mux.HandleFunc("/crawl", handler.GetCrawl)
+	mux.HandleFunc("GET /search", handler.GetSearch)
+	mux.HandleFunc("GET /crawl", handler.GetCrawl)
+	mux.HandleFunc("POST /crawl", handler.PostCrawl)
 
 	loggedMux := middleware.Logger(mux)
 

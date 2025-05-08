@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/mush1e/IndexStream-v2/internal/service"
 )
 
 func GetHome(w http.ResponseWriter, r *http.Request) {
@@ -34,5 +36,7 @@ func PostCrawl(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte("crawl has been queued for " + crawl_url))
 
-	// Implement crawl service
+	go func(crawl_url string) {
+		service.Crawl(crawl_url)
+	}(crawl_url)
 }
