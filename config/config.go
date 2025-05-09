@@ -5,6 +5,8 @@ import (
 	"strconv"
 )
 
+var cfg *Config
+
 type Config struct {
 	Port        int
 	DataURL     string
@@ -12,7 +14,7 @@ type Config struct {
 }
 
 func Load() *Config {
-	cfg := &Config{
+	cfg = &Config{
 		Port:        8080,
 		DataURL:     "./data/webpages",
 		SearchDepth: 2,
@@ -30,5 +32,9 @@ func Load() *Config {
 		cfg.SearchDepth = depth
 	}
 
+	return cfg
+}
+
+func Get() *Config {
 	return cfg
 }

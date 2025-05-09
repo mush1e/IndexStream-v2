@@ -24,3 +24,8 @@ clean:
 test:
 	@echo "🧪 Running tests..."
 	@go test ./...
+
+.PHONY: clear
+clear:
+	@echo "cleaning data dumps..."
+	@rm ./data/webpages/*
