@@ -12,6 +12,9 @@ import (
 	"github.com/mush1e/IndexStream-v2/config"
 )
 
+type URL struct {
+}
+
 func hashAndStore(url string, file_contents []byte) error {
 	cfg := config.Get()
 	sum := sha256.Sum256([]byte(url))
