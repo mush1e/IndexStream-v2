@@ -3,7 +3,6 @@ package service
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -12,9 +11,6 @@ import (
 
 	"github.com/mush1e/IndexStream-v2/config"
 )
-
-type URL struct {
-}
 
 func hashAndStore(url string, file_contents []byte) error {
 	cfg := config.Get()
@@ -71,7 +67,7 @@ func Crawl(url string) error {
 	}
 
 	for k := range urlList {
-		fmt.Printf("collected url - %q\n", k)
+		log.Printf("collected url - %q\n", k)
 	}
 
 	return nil
