@@ -3,6 +3,7 @@ package service
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -60,5 +61,18 @@ func Crawl(url string) error {
 		return err
 	}
 
-	return hashAndStore(url, body_content)
+	if err := hashAndStore(url, body_content); err != nil {
+		return err
+	}
+
+	urlList, err := URLExtractor(body_content, url)
+	if err != nil {
+		return err
+	}
+
+	for k := range urlList {
+		fmt.Printf("collected url - %q\n", k)
+	}
+
+	return nil
 }
