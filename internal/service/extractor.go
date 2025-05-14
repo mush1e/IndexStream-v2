@@ -1,82 +1,28 @@
 package service
 
-import (
-	"fmt"
-	"net/url"
-	"strings"
+import "sync"
 
-	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
-)
+var indexTargetChan = make(chan string, 10)
 
-// Helper function to check if URL is valid HTTP(S)
-func isValidHTTPURL(u *url.URL) bool {
-	return u.Host != "" && (u.Scheme == "https" || u.Scheme == "http")
+// TODO concurrently parse and extract tokens from our html byte streams,
+// We traverse these documents using our traverseDOMTree function to extract all
+// relevant tokens then we pass it on to the indexer which builds the term frequency inverted
+// Document frequency matrix (TF-IDF) [CURRENT IMPLEMENTATION SUBJECT TO CHANGE]
+
+func textExtractionWorker(filePath string, sem chan struct{}, wg *sync.WaitGroup) {
+	defer wg.Done()
+	sem <- struct{}{}
+	defer func() { <-sem }()
 }
 
-func preprocessRawURL(rawURL, baseURL string) string {
-	if rawURL == "" {
-		return ""
-	}
+func ExtractText() string {
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, 10)
 
-	rawURLObj, err := url.Parse(rawURL)
-	if err != nil {
-		return ""
+	for filePath := range indexTargetChan {
+		wg.Add(1)
+		go textExtractionWorker(filePath, sem, &wg)
 	}
-
-	// Return direct absolute URLs that use http(s)
-	if rawURLObj.IsAbs() {
-		if isValidHTTPURL(rawURLObj) {
-			return rawURLObj.String()
-		}
-		return ""
-	}
-
-	// Resolve relative URLs against base URL
-	baseURLObj, err := url.Parse(baseURL)
-	if err != nil {
-		return ""
-	}
-
-	resolvedURL := baseURLObj.ResolveReference(rawURLObj)
-	if isValidHTTPURL(resolvedURL) {
-		return resolvedURL.String()
-	}
-
+	wg.Wait()
 	return ""
-}
-
-// Pre-Order Traversal on DOM Tree
-func traverseDOMTree(node *html.Node, visit func(*html.Node)) {
-	visit(node)
-	for n := node.FirstChild; n != nil; n = n.NextSibling {
-		traverseDOMTree(n, visit)
-	}
-}
-
-func URLExtractor(fileContent []byte, baseURL string) (map[string]struct{}, error) {
-	reader := strings.NewReader(string(fileContent))
-	htmlRoot, err := html.Parse(reader)
-
-	if err != nil {
-		return nil, fmt.Errorf("parsing HTML of %s: %w", baseURL, err)
-	}
-
-	extractedURLs := make(map[string]struct{})
-
-	// Callback function to extract links from A tags
-	visitDOMElement := func(node *html.Node) {
-		if node.Type == html.ElementNode && node.DataAtom == atom.A {
-			for _, attr := range node.Attr {
-				if attr.Key == "href" {
-					rawURL := attr.Val
-					url := preprocessRawURL(rawURL, baseURL)
-					extractedURLs[url] = struct{}{}
-				}
-			}
-		}
-	}
-
-	traverseDOMTree(htmlRoot, visitDOMElement)
-	return extractedURLs, nil
 }
