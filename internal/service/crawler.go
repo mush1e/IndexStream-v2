@@ -13,7 +13,7 @@ import (
 	"github.com/mush1e/IndexStream-v2/config"
 )
 
-var cfg config.Config = *config.Get()
+var cfg *config.Config = config.Get()
 
 func hashAndStore(url string, file_contents []byte) error {
 	sum := sha256.Sum256([]byte(url))
@@ -96,7 +96,7 @@ func CrawlRecursive(seedURL string) {
 	worker = func(url string, curr_depth int) {
 
 		// Base case to terminate recursion
-		if curr_depth > maxDepth {
+		if curr_depth >= maxDepth {
 			return
 		}
 
@@ -120,7 +120,7 @@ func CrawlRecursive(seedURL string) {
 			// Once goroutine concludes we gotta tell the WaitGroup that one of the go routines have finished and to reduce count by one
 			defer wg.Done()
 
-			// Add one <insert right work> to the semaphore channel signifying another go routine has started
+			// Add one entry to the semaphore channel signifying another go routine has started
 			// If theres already 10 entries in our semaphone channel this will block the next go routine till a go routine finishes working and we have 9 in the channel buffer
 			sem <- struct{}{}
 

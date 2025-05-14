@@ -3,9 +3,13 @@ package config
 import (
 	"os"
 	"strconv"
+	"sync"
 )
 
-var cfg *Config
+var (
+	cfg  *Config
+	once sync.Once
+)
 
 type Config struct {
 	Port        int
@@ -13,7 +17,7 @@ type Config struct {
 	SearchDepth int
 }
 
-func Load() *Config {
+func load() *Config {
 	cfg = &Config{
 		Port:        8080,
 		DataURL:     "./data/webpages",
@@ -36,5 +40,9 @@ func Load() *Config {
 }
 
 func Get() *Config {
+	// Runs Load only the first time Get is called other times this condition gets ignored
+	once.Do(func() {
+		cfg = load()
+	})
 	return cfg
 }

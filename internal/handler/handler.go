@@ -37,6 +37,6 @@ func PostCrawl(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("crawl has been queued for " + crawl_url))
 
 	go func(crawl_url string) {
-		service.Crawl(crawl_url)
+		service.CrawlRecursive(crawl_url)
 	}(crawl_url)
 }

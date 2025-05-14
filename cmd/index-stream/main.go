@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	cfg := config.Load()
+	cfg := config.Get()
 	srv := server.NewServer(cfg)
 
 	go func() {
