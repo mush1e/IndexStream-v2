@@ -1,2 +1,4 @@
+github.com/kljensen/snowball v0.10.0 h1:8qgaBLraSuUVHtGH5tJ+VdGpqgfcaE2WkswL/C3nVhY=
+github.com/kljensen/snowball v0.10.0/go.mod h1:bJcxtur1W5Qw4fVj9tk5W88zyRcGQQjqahFErdcDTHk=
 golang.org/x/net v0.40.0 h1:79Xs7wF06Gbdcg4kdCCIQArK11Z1hr5POQ6+fIYHNuY=
 golang.org/x/net v0.40.0/go.mod h1:y0hY0exeL2Pku80/zKK7tpntoX23cqL3Oa6njdgRtds=
