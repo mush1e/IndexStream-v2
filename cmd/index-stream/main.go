@@ -11,11 +11,14 @@ import (
 
 	"github.com/mush1e/IndexStream-v2/config"
 	"github.com/mush1e/IndexStream-v2/internal/server"
+	"github.com/mush1e/IndexStream-v2/internal/service"
 )
 
 func main() {
 	cfg := config.Get()
 	srv := server.NewServer(cfg)
+
+	go service.ExtractText()
 
 	go func() {
 		log.Printf("Server starting on %s\n", srv.Addr)
@@ -36,6 +39,6 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatalf("Server forced to shutdown: %v\n", err)
 	}
-
+	close(service.IndexTargetChan)
 	log.Println("Server gracefully stopped")
 }

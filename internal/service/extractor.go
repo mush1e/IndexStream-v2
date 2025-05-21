@@ -2,9 +2,9 @@ package service
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -16,7 +16,7 @@ import (
 // relevant tokens then we pass it on to the indexer which builds the term frequency inverted
 // Document frequency matrix (TF-IDF) [CURRENT IMPLEMENTATION SUBJECT TO CHANGE]
 
-var indexTargetChan = make(chan string, 10)
+var IndexTargetChan = make(chan string, 10)
 
 func parseHTML(htmlBytes *[]byte) string {
 	var rawText strings.Builder
@@ -39,7 +39,7 @@ func ExtractText() string {
 	sem := make(chan struct{}, 5)
 	var wg sync.WaitGroup
 
-	for filePath := range indexTargetChan {
+	for filePath := range IndexTargetChan {
 		sem <- struct{}{}
 		wg.Add(1)
 		go func(filePath string) {
@@ -51,7 +51,13 @@ func ExtractText() string {
 				return
 			}
 			rawTextFile := parseHTML(&htmlBytes)
-			fmt.Println(rawTextFile)
+			tokens := Tokenize(rawTextFile)
+
+			docID := filepath.Base(filePath)
+			docID = strings.TrimSuffix(docID, ".html")
+
+			InvertedIndex.AddDocument(docID, tokens)
+
 		}(filePath)
 	}
 	wg.Wait()

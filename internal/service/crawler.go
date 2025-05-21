@@ -107,7 +107,7 @@ func hashAndStore(url string, file_contents []byte) error {
 		return err
 	}
 	log.Printf("Saved %s.html for %q", docID, url)
-	indexTargetChan <- file_path
+	IndexTargetChan <- file_path
 	return nil
 }
 

@@ -1,6 +1,11 @@
 package service
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
+
+var InvertedIndex = NewInvertedIndex()
 
 type Index struct {
 	mu        sync.RWMutex
@@ -52,5 +57,5 @@ func (idx *Index) AddDocument(docID string, tokens []string) {
 	// recompute avg doc length
 	idx.sumDocLen += len(tokens)
 	idx.avgDL = float64(idx.sumDocLen) / float64(idx.docCount)
-
+	fmt.Printf("%q - %+v\n\n", docID, idx.docLen[docID])
 }
