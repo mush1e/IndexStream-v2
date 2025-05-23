@@ -12,6 +12,19 @@ func wordStemmer(word string) (string, error) {
 	return snowball.Stem(word, "english", true)
 }
 
+func tokenDeduper(tokens []string) []string {
+	hashSet := make(map[string]struct{})
+	dedupedTokenList := make([]string, 0, len(tokens))
+	for _, token := range tokens {
+		hashSet[token] = struct{}{}
+	}
+
+	for token := range hashSet {
+		dedupedTokenList = append(dedupedTokenList, token)
+	}
+	return dedupedTokenList
+}
+
 func Tokenize(doc string) []string {
 	doc = strings.ToLower(doc)
 	var cleanedDoc strings.Builder

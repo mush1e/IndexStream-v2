@@ -20,6 +20,9 @@ import (
 
 var cfg *config.Config = config.Get()
 
+var DocURLMap = make(map[string]string)
+var docURLMu sync.RWMutex
+
 // Helper function to check if URL is valid HTTP(S)
 func isValidHTTPURL(u *url.URL) bool {
 	return u.Host != "" && (u.Scheme == "https" || u.Scheme == "http")
@@ -107,7 +110,13 @@ func hashAndStore(url string, file_contents []byte) error {
 		return err
 	}
 	log.Printf("Saved %s.html for %q", docID, url)
+
+	docURLMu.Lock()
+	DocURLMap[docID] = url
+	docURLMu.Unlock()
+
 	IndexTargetChan <- file_path
+
 	return nil
 }
 

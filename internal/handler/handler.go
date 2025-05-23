@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/mush1e/IndexStream-v2/internal/service"
 )
@@ -13,7 +15,24 @@ func GetHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetSearch(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Search endpoint coming soon!\n")
+	searchQuery := r.URL.Query().Get("search-query")
+	if searchQuery == "" {
+		http.Error(w, "invalid query missing 'search-query' parameter", http.StatusBadRequest)
+	}
+
+	searchLimit, err := strconv.Atoi(r.URL.Query().Get("k"))
+	if err != nil || searchLimit < 0 {
+		searchLimit = 10
+	}
+
+	searchResults := service.InvertedIndex.Search(searchQuery, searchLimit)
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", " ")
+	if err := enc.Encode(searchResults); err != nil {
+		http.Error(w, "failed to json encode search results", http.StatusInternalServerError)
+	}
 }
 
 func GetCrawl(w http.ResponseWriter, r *http.Request) {
