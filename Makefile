@@ -13,6 +13,7 @@ build:
 .PHONY: run
 run:
 	@echo "🚀 Running server..."
+	@mkdir -p data/webpages cache/disk
 	@go run $(CMD_PATH)
 
 .PHONY: clean
@@ -27,5 +28,26 @@ test:
 
 .PHONY: clear
 clear:
-	@echo "cleaning data dumps..."
-	@rm ./data/webpages/*
+	@echo "🗑️  Clearing data dumps..."
+	@rm -rf ./data/webpages/*
+	@rm -rf ./cache/disk/*
+
+.PHONY: cache-clear
+cache-clear:
+	@echo "💾 Clearing cache..."
+	@rm -rf ./cache/disk/*
+
+.PHONY: setup
+setup:
+	@echo "🛠️  Setting up directories..."
+	@mkdir -p data/webpages cache/disk
+
+.PHONY: install
+install: build
+	@echo "📦 Installing $(BINARY)..."
+	@cp bin/$(BINARY) /usr/local/bin/
+
+.PHONY: dev
+dev: setup
+	@echo "🔧 Starting development server with auto-reload..."
+	@go run $(CMD_PATH)
